@@ -62,14 +62,44 @@ if(!class_exists('WordBug')):
 			</form>
 			<?php
 			//end search form
-
+			
 			//list options
 			if(count($this->options))
 				foreach($this->options as $option){
-					print "<li>{$option->option_name}<pre>";
+
+					//title
+					print "<li>{$option->option_name}";
+
+					//delete link
+					$link_seperator = (parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY) == NULL) ? '?' : '&';
+					$link_del = "{$_SERVER['REQUEST_URI']}{$link_seperator}" . http_build_query(array(
+						'wordbug-action' => 'delete',
+						'id' => $option->option_id,
+						'keyword' => $_REQUEST['keyword']
+					));
+					print " |<a href=\"{$link_del}\">delete</a>|<pre>";
+
+					//data
 					print_r(unserialize($option->option_value));
 					print "</pre></li>\n";
 				}
+		}
+
+		/**
+		 * Delete option from database.
+		 * Will delete the option from wp_options table, then recall the
+		 * search method to show current results.
+		 */
+		private function delete(){
+			global $wpdb;
+			$id = $wpdb->prepare($_REQUEST['id'], array('%d'));
+
+			$wpdb->query("
+				DELETE FROM {$wpdb->options}
+				WHERE option_id={$id}
+			");
+
+			$this->search();
 		}
 
 		/**
