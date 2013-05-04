@@ -42,7 +42,7 @@ if(!class_exists('WordBug')):
 		 * Adds the menu to the dashboard
 		 */
 		public function admin_menu(){
-			add_menu_page('WordBug', 'WordBug', 'manage_options', 'wordbug', array(&$this, 'page_dashboard'));
+			add_submenu_page('tools.php','WordBug', 'WordBug', 'manage_options', 'wordbug', array(&$this, 'page_dashboard'));
 		}
 
 		/**
