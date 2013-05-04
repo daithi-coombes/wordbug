@@ -71,6 +71,11 @@ if(!class_exists('WordBug')):
 			}
 		}
 
+		/**
+		 * Search wp_options for keyword
+		 * @uses string $_REQUEST['keyword']
+		 * @global wpdb $wpdb The wordpress database object
+		 */
 		private function search(){
 			global $wpdb;
 			$keyword = $wpdb->prepare( $_REQUEST['keyword'], array('%s'));
