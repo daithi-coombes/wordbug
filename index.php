@@ -64,11 +64,12 @@ if(!class_exists('WordBug')):
 			//end search form
 
 			//list options
-			if(count($this->options)){
-				print "<pre>";
-				print_r($this->options);
-				print "</pre>";
-			}
+			if(count($this->options))
+				foreach($this->options as $option){
+					print "<li>{$option->option_name}<pre>";
+					print_r(unserialize($option->option_value));
+					print "</pre></li>\n";
+				}
 		}
 
 		/**
