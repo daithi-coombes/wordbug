@@ -110,11 +110,42 @@ if(!class_exists('WordBug')):
 		private function search(){
 			global $wpdb;
 			$keyword = $wpdb->prepare( $_REQUEST['keyword'], array('%s'));
+			$res = array();
+			$tables = array('options','usermeta','sitemeta');
 
-			$options = $wpdb->get_results("
-				SELECT * FROM {$wpdb->options}
-				WHERE option_name LIKE '$keyword%'
-			");
+			if(is_multisite()){
+				$blogs = $wpdb->get_results("
+					SELECT blog_id, path
+					FROM {$wpdb->blogs}
+					WHERE site_id='{$wpdb->siteid}'
+				");
+
+				foreach($blogs as $blog){
+					$blog_result = new stdClass();
+					$blog_result->id = $blog->blog_id;
+					$blog_result->path = $blog->path;
+					$blog_result->results = array();
+
+					switch_to_blog($blog->blog_id);
+					foreach($tables as $table){
+						$table = $wpdb->$table;
+						$options = $wpdb->get_results("
+							SELECT * FROM {$table}
+							WHERE option_name LIKE '$keyword%'
+						");
+
+						$blog_result->results[$table] = $options;
+					}
+					restore_current_blog();
+					$res[] = $blog_result;
+				}
+			}
+			ar_print($res);
+			/**
+			 * wp_sitemeta $wpdb->sitemeta
+			 * wp_usermeta $wpdb->usermeta
+			 * wp_options $wpdb->options
+			 */
 
 			$this->options = $options;
 		}
